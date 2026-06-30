@@ -1,0 +1,43 @@
+name: Deploy Space Coin → GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout do código
+        uses: actions/checkout@v4
+
+      - name: Injetar credenciais do Supabase no config.js
+        run: |
+          sed -i "s|https://SEU_PROJETO.supabase.co|${{ secrets.SUPABASE_URL }}|g" public/js/config.js
+          sed -i "s|sua_chave_anon_aqui|${{ secrets.SUPABASE_ANON_KEY }}|g" public/js/config.js
+
+      - name: Configurar GitHub Pages
+        uses: actions/configure-pages@v4
+
+      - name: Fazer upload dos arquivos
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: './public'
+
+      - name: Publicar no GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
