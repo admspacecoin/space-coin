@@ -1,0 +1,885 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>SPACE COIN</title>
+<style>
+:root {
+  --verde:#1a7a4a;--verde-escuro:#145c38;--verde-claro:#e8f5ee;--verde-borda:#b2d8c0;
+  --dourado:#d4a017;--dourado-bg:#fff9e6;--dourado-borda:#f0d060;
+  --escuro:#1a1a2e;--escuro2:#2a2a42;
+  --bg-page:#f2f3f5;--bg-card:#ffffff;--bg-input:#f2f3f5;
+  --txt-1:#111111;--txt-2:#666666;--txt-3:#999999;--txt-4:#bbbbbb;
+  --borda:rgba(0,0,0,0.09);--borda2:rgba(0,0,0,0.14);
+  --vermelho:#e53935;--azul:#1565c0;
+  --r4:4px;--r8:8px;--r12:12px;--r16:16px;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#dde0e5;display:flex;justify-content:center;align-items:flex-start;}
+.device{width:390px;height:100dvh;min-height:700px;max-height:900px;background:var(--bg-page);display:flex;flex-direction:column;position:relative;overflow:hidden;box-shadow:0 8px 40px rgba(0,0,0,.25);}
+@media(max-width:420px){.device{width:100vw;max-height:100dvh;box-shadow:none;}}
+.status-bar{background:var(--bg-card);display:flex;justify-content:space-between;align-items:center;padding:10px 18px 6px;font-size:11px;font-weight:600;color:var(--txt-1);border-bottom:.5px solid var(--borda);flex-shrink:0;}
+.status-icons{display:flex;gap:5px;align-items:center;}
+.status-icons i{font-size:14px;}
+.screen{display:none;flex-direction:column;flex:1;overflow:hidden;}
+.screen.active{display:flex;}
+.scroll{flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;}
+.scroll::-webkit-scrollbar{width:3px;}
+.scroll::-webkit-scrollbar-thumb{background:rgba(0,0,0,.15);border-radius:3px;}
+.page-head{background:var(--bg-card);display:flex;align-items:center;gap:10px;padding:12px 16px;border-bottom:.5px solid var(--borda);flex-shrink:0;}
+.page-head h1{font-size:17px;font-weight:700;color:var(--txt-1);flex:1;}
+.back-btn{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--txt-2);font-size:20px;border:none;background:transparent;transition:background .15s;}
+.back-btn:hover{background:var(--bg-page);}
+.head-action{background:none;border:none;cursor:pointer;color:var(--txt-2);font-size:18px;display:flex;align-items:center;}
+.bnav{background:var(--bg-card);border-top:.5px solid var(--borda);display:flex;padding:6px 0 12px;flex-shrink:0;}
+.bnav-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;color:var(--txt-4);font-size:9px;font-weight:500;transition:color .15s;border:none;background:transparent;padding:2px 0;}
+.bnav-item.active{color:var(--txt-1);}
+.bnav-item i{font-size:22px;}
+.bnav-fab{flex:1;display:flex;justify-content:center;align-items:center;}
+.fab{width:50px;height:50px;border-radius:50%;background:var(--escuro);display:flex;align-items:center;justify-content:center;margin-top:-20px;cursor:pointer;box-shadow:0 3px 14px rgba(26,26,46,.35);border:none;transition:background .2s;}
+.fab:hover{background:var(--escuro2);}
+.fab i{font-size:24px;color:#fff;}
+.card{background:var(--bg-card);border-radius:var(--r12);border:.5px solid var(--borda);}
+.card-pad{padding:14px;}
+.sec-label{font-size:10px;font-weight:700;color:var(--txt-3);text-transform:uppercase;letter-spacing:.5px;}
+.fi,.fsel,.fta{background:var(--bg-input);border:none;border-radius:var(--r8);padding:9px 11px;font-size:13px;color:var(--txt-1);outline:none;width:100%;font-family:inherit;transition:box-shadow .15s;-webkit-appearance:none;appearance:none;}
+.fi::placeholder,.fta::placeholder{color:var(--txt-4);}
+.fi:focus,.fsel:focus,.fta:focus{box-shadow:0 0 0 2px rgba(26,122,74,.3);}
+.fsel{cursor:pointer;color:var(--txt-2);}
+.fsel option{color:var(--txt-1);}
+.fta{resize:none;height:70px;line-height:1.5;}
+.frow{display:grid;gap:10px;margin-bottom:10px;}
+.frow.c2{grid-template-columns:1fr 1fr;}
+.frow.c3{grid-template-columns:1fr 1fr 1fr;}
+.frow.c1{grid-template-columns:1fr;}
+.frow:last-child{margin-bottom:0;}
+.flabel{font-size:10px;font-weight:700;color:var(--txt-3);text-transform:uppercase;letter-spacing:.35px;margin-bottom:4px;display:block;}
+.flabel .req{color:var(--vermelho);}
+.fgroup{display:flex;flex-direction:column;}
+.btn-primary{background:var(--escuro);color:#fff;border:none;border-radius:var(--r12);padding:14px;width:100%;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:8px;transition:background .2s;}
+.btn-primary:hover:not(:disabled){background:var(--escuro2);}
+.btn-primary:disabled{opacity:.6;cursor:not-allowed;}
+.btn-primary i{font-size:18px;}
+.btn-verde{background:var(--verde);color:#fff;border:none;border-radius:var(--r8);padding:11px;width:100%;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;transition:background .2s;}
+.btn-verde:hover{background:var(--verde-escuro);}
+.btn-dourado{background:var(--dourado);color:#fff;border:none;border-radius:var(--r8);padding:11px;width:100%;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;transition:background .2s;}
+.btn-dourado:hover{background:#bf9010;}
+.btn-outline{background:transparent;color:var(--txt-1);border:.5px solid var(--borda2);border-radius:var(--r8);padding:10px;width:100%;font-size:13px;font-weight:500;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:6px;transition:background .15s;}
+.btn-outline:hover{background:var(--bg-page);}
+.btn-outline i{font-size:16px;}
+.btn-danger{background:transparent;color:var(--vermelho);border:.5px solid var(--vermelho);border-radius:var(--r12);padding:12px;width:100%;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:6px;}
+.btn-danger i{font-size:16px;}
+.badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:700;}
+.badge-verde{background:var(--verde-claro);color:var(--verde);}
+.badge-dourado{background:#fff3cd;color:#856404;}
+.badge-azul{background:#e3f2fd;color:var(--azul);}
+.badge-cinza{background:#f0f0f0;color:var(--txt-2);}
+.type-toggle{display:flex;background:#e0e0e0;border-radius:var(--r8);padding:3px;}
+.type-btn{flex:1;padding:8px;text-align:center;font-size:13px;font-weight:600;border-radius:6px;cursor:pointer;color:var(--txt-3);transition:all .2s;border:none;background:transparent;font-family:inherit;}
+.type-btn.on{background:var(--bg-card);color:var(--txt-1);box-shadow:0 1px 4px rgba(0,0,0,.1);}
+.photo-box{background:var(--bg-card);border:1.5px dashed #ccc;border-radius:var(--r12);height:100px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;cursor:pointer;transition:border-color .2s,background .2s;position:relative;overflow:hidden;}
+.photo-box:hover{border-color:var(--verde);background:var(--verde-claro);}
+.photo-box i{font-size:28px;color:var(--txt-4);}
+.photo-box:hover i{color:var(--verde);}
+.photo-box .pb-label{font-size:12px;color:var(--txt-3);}
+.photo-box .pb-galeria{font-size:11px;color:var(--verde);font-weight:600;}
+.photo-box img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:var(--r12);}
+.photo-box .pb-overlay{position:absolute;inset:0;background:rgba(0,0,0,.35);display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .2s;border-radius:var(--r12);}
+.photo-box:hover .pb-overlay{opacity:1;}
+.photo-box .pb-overlay i{font-size:24px;color:#fff;}
+.list-item{display:flex;align-items:center;gap:12px;padding:11px 14px;background:var(--bg-card);border-bottom:.5px solid var(--borda);cursor:pointer;transition:background .15s;}
+.list-item:hover{background:#f8f9fa;}
+.list-item:last-child{border-bottom:none;}
+.li-thumb{width:46px;height:46px;border-radius:50%;background:var(--bg-page);flex-shrink:0;display:flex;align-items:center;justify-content:center;overflow:hidden;font-size:20px;}
+.li-thumb img{width:100%;height:100%;object-fit:cover;}
+.li-body{flex:1;min-width:0;}
+.li-name{font-size:13px;font-weight:600;color:var(--txt-1);}
+.li-meta{font-size:11px;color:var(--txt-3);margin-top:2px;}
+.li-right{text-align:right;flex-shrink:0;}
+.li-val{font-size:12px;font-weight:700;color:var(--verde);}
+.li-dash{font-size:16px;color:#ccc;font-weight:300;}
+.spec-row{display:flex;justify-content:space-between;align-items:flex-start;padding:9px 14px;border-bottom:.5px solid var(--borda);}
+.spec-row:last-child{border-bottom:none;}
+.spec-key{font-size:10px;font-weight:700;color:var(--txt-3);text-transform:uppercase;letter-spacing:.3px;flex:1;}
+.spec-val{font-size:12px;font-weight:600;color:var(--txt-1);text-align:right;flex:1.5;}
+.spec-val.accent{color:var(--verde);}
+.spec-val.accent2{color:var(--azul);}
+.section-head{padding:12px 14px 6px;display:flex;justify-content:space-between;align-items:center;}
+.section-head .sh-title{font-size:14px;font-weight:700;color:var(--txt-1);}
+.section-head .sh-link{font-size:12px;color:var(--verde);cursor:pointer;font-weight:600;}
+.ia-btn{background:var(--verde-claro);border:.5px solid var(--verde-borda);border-radius:var(--r8);padding:11px 14px;display:flex;align-items:center;justify-content:center;gap:8px;cursor:pointer;font-size:13px;color:var(--verde);font-weight:700;transition:background .2s;width:100%;border-radius:var(--r8);font-family:inherit;}
+.ia-btn:hover{background:#d0eadb;}
+.ia-btn i{font-size:16px;}
+.est-box{background:var(--dourado-bg);border:.5px solid var(--dourado-borda);border-radius:var(--r12);padding:14px;}
+.est-title{display:flex;align-items:center;gap:7px;font-size:13px;font-weight:700;color:#b38000;margin-bottom:4px;}
+.est-title i{font-size:15px;}
+.est-sub{font-size:11px;color:#9a7000;margin-bottom:10px;line-height:1.5;}
+.specs-toggle{display:flex;align-items:center;gap:7px;font-size:13px;font-weight:700;color:var(--txt-1);margin-bottom:12px;cursor:pointer;}
+.specs-toggle i{font-size:14px;color:var(--txt-3);}
+.stat-mini{background:var(--bg-card);border-radius:var(--r12);padding:12px;}
+.stat-mini .sm-label{display:flex;align-items:center;gap:4px;font-size:10px;font-weight:700;color:var(--txt-3);text-transform:uppercase;letter-spacing:.3px;margin-bottom:6px;}
+.stat-mini .sm-label i{font-size:13px;}
+.stat-mini .sm-val{font-size:22px;font-weight:700;color:var(--txt-1);}
+.stat-mini .sm-sub{font-size:11px;color:var(--txt-3);margin-top:2px;}
+.dist-bar-wrap{height:7px;border-radius:4px;overflow:hidden;background:#e8e8e8;display:flex;margin-bottom:8px;}
+.dbm{background:var(--dourado);}
+.dbc{background:var(--verde);}
+.group-head{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:var(--bg-card);cursor:pointer;border-bottom:.5px solid var(--borda);}
+.group-head-l{display:flex;align-items:center;gap:7px;font-size:13px;font-weight:700;color:var(--verde);}
+.group-head-l i{font-size:15px;}
+.group-head-r{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--txt-3);}
+.evento-row{display:flex;gap:12px;padding:12px 14px;background:var(--bg-card);border-bottom:.5px solid var(--borda);cursor:pointer;transition:background .15s;}
+.evento-row:hover{background:#f8f9fa;}
+.ev-date{width:38px;flex-shrink:0;text-align:center;}
+.ev-mes{font-size:9px;font-weight:700;color:var(--verde);text-transform:uppercase;}
+.ev-dia{font-size:22px;font-weight:700;color:var(--txt-1);line-height:1;}
+.ev-ano{font-size:9px;color:var(--txt-4);}
+.ev-body{flex:1;}
+.ev-nome{font-size:13px;font-weight:700;color:var(--txt-1);}
+.ev-desc{font-size:11px;color:var(--txt-3);margin-top:2px;line-height:1.4;}
+.ev-loc{font-size:11px;color:var(--txt-4);margin-top:4px;display:flex;align-items:center;gap:3px;}
+.ev-loc i{font-size:12px;}
+.perf-avatar{width:70px;height:70px;border-radius:50%;background:var(--dourado);display:flex;align-items:center;justify-content:center;margin:0 auto 8px;position:relative;overflow:hidden;}
+.perf-avatar i{font-size:34px;color:#fff;}
+.menu-row{display:flex;align-items:center;gap:12px;padding:12px 14px;background:var(--bg-card);border-bottom:.5px solid var(--borda);cursor:pointer;transition:background .15s;}
+.menu-row:hover{background:#f8f9fa;}
+.menu-row i{font-size:18px;color:var(--txt-3);}
+.menu-row .mr-label{flex:1;font-size:13px;color:var(--txt-1);}
+.menu-row .mr-val{font-size:12px;color:var(--txt-3);}
+.menu-row .mr-chev{font-size:16px;color:var(--txt-4);}
+.det-photos{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:12px 14px 6px;}
+.det-photo{background:var(--escuro);border-radius:var(--r12);height:120px;overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:40px;cursor:pointer;position:relative;}
+.det-photo img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;}
+.det-type-lbl{font-size:10px;font-weight:700;color:var(--verde);text-transform:uppercase;letter-spacing:.5px;padding:6px 14px 2px;}
+.det-nome{font-size:22px;font-weight:700;color:var(--txt-1);padding:0 14px;}
+.det-pais{font-size:13px;color:var(--txt-3);padding:3px 14px 0;display:flex;align-items:center;gap:6px;}
+.det-val-box{margin:10px 14px;border-radius:var(--r12);background:var(--bg-card);border:.5px solid var(--borda);padding:12px 14px;}
+.det-val-lbl{font-size:10px;font-weight:700;color:var(--txt-3);text-transform:uppercase;letter-spacing:.3px;margin-bottom:4px;}
+.det-val-num{font-size:22px;font-weight:700;color:var(--txt-1);}
+.rot-box{background:var(--bg-page);border:.5px solid var(--borda);border-radius:var(--r8);padding:10px;display:flex;align-items:center;justify-content:space-around;margin-bottom:6px;}
+.rot-step{display:flex;flex-direction:column;align-items:center;gap:3px;font-size:10px;color:var(--txt-3);font-weight:600;}
+.rot-step i{font-size:18px;color:var(--txt-2);}
+.rot-seta{font-size:14px;color:var(--txt-4);}
+.modal-overlay{position:absolute;inset:0;background:rgba(0,0,0,.55);display:flex;flex-direction:column;justify-content:flex-end;z-index:200;opacity:0;pointer-events:none;transition:opacity .25s;}
+.modal-overlay.open{opacity:1;pointer-events:all;}
+.modal-sheet{background:var(--bg-card);border-radius:20px 20px 0 0;padding:0 0 24px;transform:translateY(100%);transition:transform .3s;}
+.modal-overlay.open .modal-sheet{transform:translateY(0);}
+.modal-handle{width:40px;height:4px;background:#ddd;border-radius:2px;margin:12px auto 16px;}
+.modal-title{font-size:15px;font-weight:700;color:var(--txt-1);padding:0 18px 14px;}
+.modal-form{padding:0 18px;}
+.modal-form .flabel{margin-bottom:5px;display:block;}
+.prog-wrap{background:#e8e8e8;border-radius:4px;height:5px;overflow:hidden;flex:1;}
+.prog-fill{height:100%;background:var(--verde);border-radius:4px;}
+.toast{position:absolute;bottom:80px;left:50%;transform:translateX(-50%) translateY(20px);background:rgba(26,26,46,.92);color:#fff;padding:10px 18px;border-radius:24px;font-size:13px;font-weight:600;white-space:nowrap;opacity:0;pointer-events:none;transition:all .3s;z-index:300;}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+.coll-card{background:var(--bg-card);border:.5px solid var(--borda);border-radius:var(--r12);padding:14px;cursor:pointer;transition:box-shadow .2s;}
+.coll-card:hover{box-shadow:0 2px 12px rgba(0,0,0,.08);}
+.coll-card-head{display:flex;align-items:center;gap:8px;margin-bottom:10px;}
+.coll-card-head i{font-size:18px;color:var(--verde);}
+.coll-card-head .cc-nome{font-size:14px;font-weight:700;color:var(--txt-1);}
+.coll-card-head .cc-count{font-size:11px;color:var(--txt-3);margin-left:auto;}
+.coll-progbar{display:flex;align-items:center;gap:8px;margin-top:6px;}
+.coll-pct{font-size:11px;font-weight:700;color:var(--verde);min-width:28px;}
+.search-wrap{padding:10px 14px;background:var(--bg-card);border-bottom:.5px solid var(--borda);}
+.search-inp-wrap{display:flex;align-items:center;gap:8px;background:var(--bg-page);border-radius:var(--r8);padding:8px 12px;}
+.search-inp-wrap i{font-size:16px;color:var(--txt-4);}
+.search-inp{background:transparent;border:none;outline:none;font-size:13px;color:var(--txt-1);flex:1;font-family:inherit;}
+.search-inp::placeholder{color:var(--txt-4);}
+.filter-chips{display:flex;gap:6px;padding:8px 14px;overflow-x:auto;background:var(--bg-card);border-bottom:.5px solid var(--borda);}
+.filter-chips::-webkit-scrollbar{display:none;}
+.fchip{white-space:nowrap;padding:5px 13px;border-radius:20px;font-size:11px;font-weight:600;border:.5px solid var(--borda2);background:var(--bg-card);color:var(--txt-3);cursor:pointer;transition:all .15s;}
+.fchip.on{background:var(--escuro);color:#fff;border-color:var(--escuro);}
+.nota-txt{font-size:12px;color:var(--txt-2);line-height:1.7;}
+.nota-txt a{color:var(--verde);text-decoration:none;}
+.exp-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;}
+.exp-btn-sm{background:var(--bg-page);border:none;border-radius:var(--r8);padding:10px 8px;font-size:12px;color:var(--txt-2);cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:5px;font-weight:600;}
+.exp-btn-sm i{font-size:15px;}
+.best-card{background:var(--dourado);border-radius:var(--r12);padding:13px 16px;display:flex;align-items:center;gap:12px;cursor:pointer;}
+.best-icon{width:36px;height:36px;background:rgba(255,255,255,.25);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.best-icon i{font-size:18px;color:#fff;}
+.best-lbl{font-size:9px;text-transform:uppercase;letter-spacing:.5px;color:rgba(255,255,255,.75);margin-bottom:2px;}
+.best-nome{font-size:14px;font-weight:700;color:#fff;}
+.best-sub{font-size:11px;color:rgba(255,255,255,.7);margin-top:1px;}
+.divider{height:.5px;background:var(--borda);margin:0 14px;}
+.muted{color:var(--txt-3);}.green{color:var(--verde);}.gold{color:var(--dourado);}.red{color:var(--vermelho);}
+
+/* ── SIDEBAR (desktop) ───────────────────────────────────────── */
+.sidebar{display:none;width:220px;flex-shrink:0;background:var(--bg-card);border-right:.5px solid var(--borda);flex-direction:column;}
+.sidebar-logo{display:flex;align-items:center;gap:10px;padding:20px 16px 16px;border-bottom:.5px solid var(--borda);font-size:16px;font-weight:800;color:var(--txt-1);flex-shrink:0;letter-spacing:.3px;}
+.sidebar-nav{display:flex;flex-direction:column;flex:1;padding:8px 0;overflow-y:auto;}
+.snav-item{display:flex;align-items:center;gap:10px;padding:12px 16px;font-size:13px;font-weight:500;color:var(--txt-2);background:transparent;border:none;cursor:pointer;font-family:inherit;text-align:left;width:100%;transition:background .15s,color .15s;}
+.snav-item:hover{background:var(--bg-page);color:var(--txt-1);}
+.snav-item.active{color:var(--verde);font-weight:700;background:var(--verde-claro);}
+.snav-item i{font-size:18px;flex-shrink:0;width:22px;}
+.snav-add{background:var(--escuro)!important;color:#fff!important;border-radius:var(--r8);margin:8px 12px;width:calc(100% - 24px);padding:11px 14px;}
+.snav-add:hover{background:var(--escuro2)!important;}
+
+/* ── RESPONSIVE DESKTOP ──────────────────────────────────────── */
+@media(min-width:769px){
+  html,body{align-items:stretch;}
+  .device{width:100vw;max-width:100vw;height:100vh;max-height:100vh;box-shadow:none;flex-direction:row;}
+  .status-bar{display:none;}
+  .sidebar{display:flex;}
+  .bnav{display:none!important;}
+  .screen.active{flex:1;min-width:0;}
+  /* Telas de formulário e detalhe: centra e limita largura */
+  #scr-catalogar .scroll,
+  #scr-perfil .scroll,
+  #scr-det-moeda .scroll,
+  #scr-det-cedula .scroll,
+  #scr-det-colecao .scroll{display:flex;flex-direction:column;align-items:center;}
+  #scr-catalogar .scroll > *,
+  #scr-perfil .scroll > *,
+  #scr-det-moeda .scroll > *,
+  #scr-det-cedula .scroll > *,
+  #scr-det-colecao .scroll > *{width:100%;max-width:720px;}
+  /* Modal cobre apenas a área de conteúdo */
+  .modal-overlay{left:220px;}
+  /* Toast fica na área de conteúdo */
+  .toast{bottom:32px;}
+  /* Page heads nas telas de detalhe ficam sticky no topo */
+  .page-head{position:sticky;top:0;z-index:10;}
+}
+</style>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
+</head>
+<body>
+
+<div class="device" id="app">
+
+  <!-- SIDEBAR (visível apenas no desktop) -->
+  <nav class="sidebar">
+    <div class="sidebar-logo">
+      <span style="font-size:22px;">🪙</span> SPACE COIN
+    </div>
+    <div class="sidebar-nav">
+      <button class="snav-item active" id="snav-inicio" onclick="navTo('inicio')">
+        <i class="ti ti-layout-grid"></i> Início
+      </button>
+      <button class="snav-item" id="snav-catalogo" onclick="navTo('catalogo')">
+        <i class="ti ti-books"></i> Catálogo
+      </button>
+      <button class="snav-item snav-add" onclick="openCatalogar()">
+        <i class="ti ti-plus"></i> Catalogar Peça
+      </button>
+      <button class="snav-item" id="snav-eventos" onclick="navTo('eventos')">
+        <i class="ti ti-calendar-event"></i> Parceiros e Eventos
+      </button>
+      <button class="snav-item" id="snav-perfil" onclick="navTo('perfil')">
+        <i class="ti ti-user"></i> Perfil
+      </button>
+    </div>
+  </nav>
+
+  <!-- STATUS BAR -->
+  <div class="status-bar">
+    <span style="font-weight:700;">9:41</span>
+    <span id="sb-titulo" style="font-size:11px;font-weight:700;letter-spacing:.3px;">SPACE COIN</span>
+    <div class="status-icons">
+      <i class="ti ti-wifi"></i>
+      <i class="ti ti-battery-2"></i>
+    </div>
+  </div>
+
+
+  <!-- ═══════════════════════════════════════════ -->
+  <!-- TELA: INÍCIO                                -->
+  <!-- ═══════════════════════════════════════════ -->
+  <div class="screen active" id="scr-inicio">
+    <div class="scroll">
+      <!-- Header -->
+      <div style="background:var(--bg-card);padding:14px 16px 12px;display:flex;justify-content:space-between;align-items:flex-start;border-bottom:.5px solid var(--borda);">
+        <div>
+          <div style="font-size:12px;color:var(--txt-3);">Olá, <span id="dash-username">...</span></div>
+          <div style="font-size:22px;font-weight:800;color:var(--txt-1);margin-top:1px;">Meu Acervo</div>
+        </div>
+        <button onclick="toggleDark()" style="background:var(--bg-page);border:none;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;">
+          <i class="ti ti-moon" style="font-size:18px;color:var(--txt-2);"></i>
+        </button>
+      </div>
+
+      <!-- Cards moeda/cédula -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:12px 14px;">
+        <div class="stat-mini" style="background:#fff9e6;border:.5px solid #f0e08a;">
+          <div class="sm-label" style="color:#b38000;"><i class="ti ti-coin" style="color:var(--dourado);"></i> Moedas</div>
+          <div class="sm-val" id="dash-moedas-count">—</div>
+          <div class="sm-sub" id="dash-moedas-paises">—</div>
+          <div style="font-size:11px;color:var(--txt-4);margin-top:3px;" id="dash-moedas-val">R$ 0,00</div>
+        </div>
+        <div class="stat-mini" style="background:var(--verde-claro);border:.5px solid var(--verde-borda);">
+          <div class="sm-label" style="color:var(--verde);"><i class="ti ti-cash-banknote" style="color:var(--verde);"></i> Cédulas</div>
+          <div class="sm-val" id="dash-cedulas-count">—</div>
+          <div class="sm-sub" id="dash-cedulas-paises">—</div>
+          <div style="font-size:11px;color:var(--txt-4);margin-top:3px;" id="dash-cedulas-val">R$ 0,00</div>
+        </div>
+      </div>
+
+      <!-- Total -->
+      <div style="margin:0 14px;background:var(--bg-card);border-radius:var(--r12);border:.5px solid var(--borda);padding:12px 14px;display:flex;justify-content:space-between;align-items:center;">
+        <div>
+          <div style="font-size:13px;font-weight:700;color:var(--txt-1);" id="dash-total-count">— itens no total</div>
+          <div style="font-size:10px;color:var(--txt-4);margin-top:2px;text-transform:uppercase;letter-spacing:.3px;" id="dash-total-val">Valor total estimado · R$ 0,00</div>
+        </div>
+        <div style="font-size:12px;font-weight:700;color:var(--verde);" id="dash-colecoes-count">—</div>
+      </div>
+
+      <!-- Distribuição -->
+      <div style="margin:10px 14px;background:var(--bg-card);border-radius:var(--r12);border:.5px solid var(--borda);padding:12px 14px;">
+        <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--txt-3);font-weight:700;text-transform:uppercase;margin-bottom:8px;">
+          <span>Distribuição</span><span id="dash-dist-total">0 peças</span>
+        </div>
+        <div class="dist-bar-wrap">
+          <div class="dbm" id="dash-bar-moedas" style="width:50%;"></div>
+          <div class="dbc" id="dash-bar-cedulas" style="width:50%;"></div>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:11px;font-weight:700;">
+          <span style="color:var(--dourado);display:flex;align-items:center;gap:4px;"><i class="ti ti-coin" style="font-size:13px;"></i> <span id="dash-dist-moedas">0 moedas</span></span>
+          <span style="color:var(--verde);display:flex;align-items:center;gap:4px;"><i class="ti ti-cash-banknote" style="font-size:13px;"></i> <span id="dash-dist-cedulas">0 cédulas</span></span>
+        </div>
+      </div>
+
+      <!-- Ações rápidas -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:0 14px;">
+        <div onclick="openCatalogar()" style="background:var(--escuro);border-radius:var(--r12);padding:16px;cursor:pointer;">
+          <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px;"><i class="ti ti-plus" style="font-size:14px;color:rgba(255,255,255,.5);"></i></div>
+          <div style="font-size:15px;font-weight:700;color:#fff;">Catalogar</div>
+          <div style="font-size:11px;color:rgba(255,255,255,.5);margin-top:2px;">Nova peça</div>
+        </div>
+        <div onclick="navTo('colecoes')" style="background:var(--bg-card);border:.5px solid var(--borda);border-radius:var(--r12);padding:16px;cursor:pointer;">
+          <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px;"><i class="ti ti-folder" style="font-size:14px;color:var(--verde);"></i></div>
+          <div style="font-size:15px;font-weight:700;color:var(--verde);">Coleções</div>
+          <div style="font-size:11px;color:var(--txt-3);margin-top:2px;" id="dash-colecoes-sub">0 criadas</div>
+        </div>
+      </div>
+
+      <!-- Peça mais valiosa -->
+      <div style="padding:10px 14px;" id="dash-best-card">
+        <div class="best-card">
+          <div class="best-icon"><i class="ti ti-trophy"></i></div>
+          <div>
+            <div class="best-lbl">Peça mais valiosa</div>
+            <div class="best-nome" id="dash-best-nome">—</div>
+            <div class="best-sub" id="dash-best-val">—</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recentes -->
+      <div class="section-head">
+        <span class="sh-title">Recentes</span>
+        <span class="sh-link" onclick="navTo('catalogo')">Ver todos</span>
+      </div>
+      <div style="margin:0 14px;background:var(--bg-card);border-radius:var(--r12);border:.5px solid var(--borda);overflow:hidden;" id="dash-recentes">
+        <div style="padding:20px;text-align:center;color:var(--txt-4);font-size:13px;">Carregando...</div>
+      </div>
+      <div style="height:16px;"></div>
+    </div>
+    <div class="bnav">
+      <button class="bnav-item active" onclick="navTo('inicio')"><i class="ti ti-layout-grid"></i><span>Início</span></button>
+      <button class="bnav-item" onclick="navTo('catalogo')"><i class="ti ti-books"></i><span>Catálogo</span></button>
+      <div class="bnav-fab"><button class="fab" onclick="openCatalogar()"><i class="ti ti-plus"></i></button></div>
+      <button class="bnav-item" onclick="navTo('eventos')"><i class="ti ti-calendar-event"></i><span>Eventos</span></button>
+      <button class="bnav-item" onclick="navTo('perfil')"><i class="ti ti-user"></i><span>Perfil</span></button>
+    </div>
+  </div><!-- /inicio -->
+
+
+  <!-- ═══════════════════════════════════════════ -->
+  <!-- TELA: CATÁLOGO                              -->
+  <!-- ═══════════════════════════════════════════ -->
+  <div class="screen" id="scr-catalogo">
+    <div style="background:var(--bg-card);padding:14px 16px 10px;border-bottom:.5px solid var(--borda);flex-shrink:0;">
+      <div style="font-size:22px;font-weight:800;color:var(--txt-1);">Catálogo</div>
+      <div style="font-size:12px;color:var(--txt-3);margin-top:1px;" id="catalog-count">0 itens</div>
+    </div>
+    <div class="search-wrap" style="flex-shrink:0;">
+      <div class="search-inp-wrap">
+        <i class="ti ti-search"></i>
+        <input class="search-inp" type="text" placeholder="Buscar por país, ano, valor, material..."
+          oninput="searchCatalog(this.value)">
+        <i class="ti ti-x" style="font-size:14px;color:var(--txt-4);cursor:pointer;" onclick="this.previousElementSibling.value='';renderCatalog(pecas)"></i>
+      </div>
+    </div>
+    <div class="filter-chips" style="flex-shrink:0;">
+      <div class="fchip on" onclick="filterCatalog('todos')">Todos</div>
+      <div class="fchip" onclick="filterCatalog('moeda')">Moedas</div>
+      <div class="fchip" onclick="filterCatalog('cedula')">Cédulas</div>
+    </div>
+    <div class="scroll">
+      <div id="catalog-list">
+        <div style="padding:30px;text-align:center;color:var(--txt-4);font-size:13px;">Carregando...</div>
+      </div>
+    </div>
+    <div class="bnav">
+      <button class="bnav-item" onclick="navTo('inicio')"><i class="ti ti-layout-grid"></i><span>Início</span></button>
+      <button class="bnav-item active" onclick="navTo('catalogo')"><i class="ti ti-books"></i><span>Catálogo</span></button>
+      <div class="bnav-fab"><button class="fab" onclick="openCatalogar()"><i class="ti ti-plus"></i></button></div>
+      <button class="bnav-item" onclick="navTo('eventos')"><i class="ti ti-calendar-event"></i><span>Eventos</span></button>
+      <button class="bnav-item" onclick="navTo('perfil')"><i class="ti ti-user"></i><span>Perfil</span></button>
+    </div>
+  </div><!-- /catalogo -->
+
+
+  <!-- ═══════════════════════════════════════════ -->
+  <!-- TELA: CATALOGAR PEÇA                        -->
+  <!-- ═══════════════════════════════════════════ -->
+  <div class="screen" id="scr-catalogar">
+    <div class="page-head" style="flex-shrink:0;">
+      <button class="back-btn" onclick="goBack()"><i class="ti ti-arrow-left" style="font-size:20px;"></i></button>
+      <h1>Catalogar Peça</h1>
+    </div>
+    <div class="scroll" id="form-scroll">
+      <form id="form-catalogar" onsubmit="return false;">
+        <!-- Fotos -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:14px 14px 6px;">
+          <div class="photo-box" onclick="triggerUpload('foto-frente')">
+            <input type="file" id="foto-frente" accept="image/*" style="display:none;" onchange="previewFoto(this,'prev-frente','lbl-frente')">
+            <img id="prev-frente" src="" style="display:none;">
+            <div id="lbl-frente" style="display:flex;flex-direction:column;align-items:center;gap:5px;">
+              <i class="ti ti-camera"></i>
+              <span class="pb-label">Frente</span>
+              <span class="pb-galeria">galeria</span>
+            </div>
+            <div class="pb-overlay"><i class="ti ti-refresh"></i></div>
+          </div>
+          <div class="photo-box" onclick="triggerUpload('foto-verso')">
+            <input type="file" id="foto-verso" accept="image/*" style="display:none;" onchange="previewFoto(this,'prev-verso','lbl-verso')">
+            <img id="prev-verso" src="" style="display:none;">
+            <div id="lbl-verso" style="display:flex;flex-direction:column;align-items:center;gap:5px;">
+              <i class="ti ti-camera"></i>
+              <span class="pb-label">Verso</span>
+              <span class="pb-galeria">galeria</span>
+            </div>
+            <div class="pb-overlay"><i class="ti ti-refresh"></i></div>
+          </div>
+        </div>
+
+        <!-- IA -->
+        <div style="padding:0 14px 8px;">
+          <button type="button" class="ia-btn" onclick="simularIA()">
+            <i class="ti ti-sparkles"></i> Identificar pela foto (IA)
+          </button>
+        </div>
+
+        <!-- Toggle -->
+        <div style="padding:0 14px 10px;">
+          <div class="type-toggle">
+            <button type="button" class="type-btn on" id="tab-moeda" onclick="setTipo('moeda')">Moeda</button>
+            <button type="button" class="type-btn" id="tab-cedula" onclick="setTipo('cedula')">Cédula</button>
+          </div>
+        </div>
+
+        <!-- Campos comuns -->
+        <div style="margin:0 14px 10px;" class="card card-pad">
+          <div class="frow c2">
+            <div class="fgroup"><label class="flabel">País <span class="req">*</span></label><input class="fi" id="campo-pais" placeholder="Brasil"></div>
+            <div class="fgroup"><label class="flabel">Ano</label><input class="fi" id="campo-ano" type="number" placeholder="1998"></div>
+          </div>
+          <div class="frow c2">
+            <div class="fgroup"><label class="flabel">Valor facial</label><input class="fi" id="campo-valor-facial" type="number" step="0.01" placeholder="1"></div>
+            <div class="fgroup"><label class="flabel">Moeda (código)</label><input class="fi" id="campo-moeda" placeholder="BRL"></div>
+          </div>
+          <div class="frow c1"><div class="fgroup"><label class="flabel">Material</label><input class="fi" id="campo-material" placeholder="Bronze, alumínio, papel..."></div></div>
+          <div class="frow c1"><div class="fgroup"><label class="flabel">Estado de conservação</label>
+            <select class="fsel" id="campo-conservacao">
+              <option value="">Selecione</option>
+              <option>Flor de Cunho (FC)</option>
+              <option>Soberba (S)</option>
+              <option>Muito Bem Conservada (MBC)</option>
+              <option>Bem Conservada (BC)</option>
+              <option>Regular (R)</option>
+              <option>Flor de Estampa (FE)</option>
+            </select>
+          </div></div>
+          <div class="frow c1" style="margin-bottom:0;"><div class="fgroup"><label class="flabel">Variação / edição</label><input class="fi" id="campo-variacao" placeholder="Comemorativa, erro de cunhagem..."></div></div>
+        </div>
+
+        <!-- Specs MOEDA -->
+        <div style="margin:0 14px 10px;" class="card card-pad" id="specs-moeda">
+          <div class="specs-toggle"><i class="ti ti-chevron-down"></i> Especificações técnicas (moeda)</div>
+          <div class="frow c3">
+            <div class="fgroup"><label class="flabel">Diâmetro (mm)</label><input class="fi" id="campo-diametro" type="number" step="0.1"></div>
+            <div class="fgroup"><label class="flabel">Peso (g)</label><input class="fi" id="campo-peso" type="number" step="0.01"></div>
+            <div class="fgroup"><label class="flabel">Espessura (mm)</label><input class="fi" id="campo-espessura" type="number" step="0.01"></div>
+          </div>
+          <div class="frow c2">
+            <div class="fgroup"><label class="flabel">Formato</label><input class="fi" id="campo-formato" placeholder="Circular, quadrado..."></div>
+            <div class="fgroup"><label class="flabel">Tipo de borda</label><input class="fi" id="campo-borda" placeholder="Serrilhada, lisa..."></div>
+          </div>
+          <div class="frow c2">
+            <div class="fgroup"><label class="flabel">Rotação</label><input class="fi" id="campo-rotacao" placeholder="Moeda (180°) ou Medalha"></div>
+            <div class="fgroup"><label class="flabel">Cunhagem (qtd.)</label><input class="fi" id="campo-cunhagem" type="number"></div>
+          </div>
+          <div class="frow c3">
+            <div class="fgroup"><label class="flabel">Código Krause</label><input class="fi" id="campo-krause" placeholder="KM# 623"></div>
+            <div class="fgroup"><label class="flabel">Início emissão</label><input class="fi" id="campo-inicio-emissao" type="number"></div>
+            <div class="fgroup"><label class="flabel">Fim emissão</label><input class="fi" id="campo-fim-emissao" type="number"></div>
+          </div>
+          <div class="frow c1" style="margin-bottom:0;"><div class="fgroup"><label class="flabel">Descrição / notas históricas</label><textarea class="fta" id="campo-descricao" placeholder="Detalhes adicionais..."></textarea></div></div>
+        </div>
+
+        <!-- Specs CÉDULA -->
+        <div style="margin:0 14px 10px;display:none;" class="card card-pad" id="specs-cedula">
+          <div class="specs-toggle"><i class="ti ti-chevron-down"></i> Especificações técnicas (cédula)</div>
+          <div class="frow c2">
+            <div class="fgroup"><label class="flabel">Largura (mm)</label><input class="fi" id="campo-largura" type="number"></div>
+            <div class="fgroup"><label class="flabel">Altura (mm)</label><input class="fi" id="campo-altura" type="number"></div>
+          </div>
+          <div class="frow c1"><div class="fgroup"><label class="flabel">Código Krause</label><input class="fi" id="campo-krause-ced" placeholder="P# 245"></div></div>
+          <div class="frow c2">
+            <div class="fgroup"><label class="flabel">Primeira impressão</label><input class="fi" id="campo-inicio-emissao-ced" type="number"></div>
+            <div class="fgroup"><label class="flabel">Última impressão</label><input class="fi" id="campo-fim-emissao-ced" type="number"></div>
+          </div>
+          <div class="frow c2">
+            <div class="fgroup"><label class="flabel">Número de série</label><input class="fi" id="campo-serie"></div>
+            <div class="fgroup"><label class="flabel">Série/assinatura</label><input class="fi" id="campo-assinatura"></div>
+          </div>
+          <div class="frow c2">
+            <div class="fgroup"><label class="flabel">Placa</label><input class="fi" id="campo-placa"></div>
+            <div class="fgroup"><label class="flabel">Impressor</label><input class="fi" id="campo-impressor" placeholder="Casa da Moeda do Brasil..."></div>
+          </div>
+          <div class="frow c1"><div class="fgroup"><label class="flabel">Recursos de segurança</label><input class="fi" id="campo-seguranca" placeholder="Marca d'água, fio de segurança..."></div></div>
+          <div class="frow c1" style="margin-bottom:0;"><div class="fgroup"><label class="flabel">Descrição / notas históricas</label><textarea class="fta" id="campo-descricao-ced" placeholder="Detalhes adicionais..."></textarea></div></div>
+        </div>
+
+        <!-- Coleção -->
+        <div style="margin:0 14px 10px;" class="card card-pad">
+          <div class="fgroup"><label class="flabel">Coleção (opcional)</label>
+            <select class="fsel" id="campo-colecao">
+              <option value="">Sem coleção</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Estimativa IA -->
+        <div style="margin:0 14px 10px;" class="est-box">
+          <div class="est-title"><i class="ti ti-sparkles"></i> Estimativa por IA</div>
+          <div class="est-sub">Use a IA para estimar o valor de mercado e gerar contexto histórico. (Em breve)</div>
+          <button type="button" class="btn-dourado" onclick="showToast('Recurso de IA em breve!')">Gerar estimativa</button>
+        </div>
+
+        <!-- Salvar -->
+        <div style="padding:0 14px 20px;">
+          <button type="button" class="btn-primary" id="btn-salvar" onclick="salvarPeca()">
+            <i class="ti ti-device-floppy"></i> Salvar peça
+          </button>
+        </div>
+      </form>
+    </div>
+    <div class="bnav">
+      <button class="bnav-item" onclick="navTo('inicio')"><i class="ti ti-layout-grid"></i><span>Início</span></button>
+      <button class="bnav-item" onclick="navTo('catalogo')"><i class="ti ti-books"></i><span>Catálogo</span></button>
+      <div class="bnav-fab"><button class="fab" onclick="openCatalogar()"><i class="ti ti-plus"></i></button></div>
+      <button class="bnav-item" onclick="navTo('eventos')"><i class="ti ti-calendar-event"></i><span>Eventos</span></button>
+      <button class="bnav-item" onclick="navTo('perfil')"><i class="ti ti-user"></i><span>Perfil</span></button>
+    </div>
+  </div><!-- /catalogar -->
+
+
+  <!-- ═══════════════════════════════════════════ -->
+  <!-- TELA: DETALHE MOEDA                         -->
+  <!-- ═══════════════════════════════════════════ -->
+  <div class="screen" id="scr-det-moeda">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:var(--bg-page);flex-shrink:0;">
+      <button class="back-btn" onclick="goBack()"><i class="ti ti-arrow-left" style="font-size:20px;color:var(--txt-2);"></i></button>
+      <div style="display:flex;gap:14px;">
+        <button class="head-action" onclick="showToast('Link copiado!')"><i class="ti ti-share"></i></button>
+        <button class="head-action" style="color:var(--vermelho);" onclick="deletarPeca()"><i class="ti ti-trash"></i></button>
+      </div>
+    </div>
+    <div class="scroll">
+      <div class="det-photos">
+        <div class="det-photo" onclick="triggerUpload('dm-frente')">
+          <input type="file" id="dm-frente" accept="image/*" style="display:none;" onchange="previewDet(this,'dm-prev-frente','dm-ph-frente')">
+          <div id="dm-ph-frente" style="font-size:40px;">🪙</div>
+          <img id="dm-prev-frente" src="" style="display:none;position:absolute;inset:0;width:100%;height:100%;object-fit:cover;">
+        </div>
+        <div class="det-photo" onclick="triggerUpload('dm-verso')">
+          <input type="file" id="dm-verso" accept="image/*" style="display:none;" onchange="previewDet(this,'dm-prev-verso','dm-ph-verso')">
+          <div id="dm-ph-verso" style="font-size:40px;">🪙</div>
+          <img id="dm-prev-verso" src="" style="display:none;position:absolute;inset:0;width:100%;height:100%;object-fit:cover;">
+        </div>
+      </div>
+      <div class="det-type-lbl">MOEDA</div>
+      <div class="det-nome" id="det-moeda-nome">—</div>
+      <div class="det-pais"><span id="det-moeda-pais">—</span> <span id="det-moeda-flag" style="font-size:20px;"></span></div>
+      <div class="det-val-box">
+        <div class="det-val-lbl">Valor estimado</div>
+        <div class="det-val-num" id="det-moeda-val">—</div>
+        <button class="btn-verde" style="margin-top:10px;font-size:12px;padding:9px;" onclick="showToast('Estimativa por IA em breve!')">Gerar estimativa por IA</button>
+      </div>
+      <div style="margin:0 14px 10px;" class="card">
+        <div class="spec-row"><span class="spec-key">Material</span><span class="spec-val accent" id="det-moeda-material">—</span></div>
+        <div class="spec-row"><span class="spec-key">Conservação</span><span class="spec-val" id="det-moeda-conservacao">—</span></div>
+      </div>
+      <div style="padding:4px 14px 6px;font-size:13px;font-weight:700;color:var(--txt-1);">Especificações técnicas</div>
+      <div style="margin:0 14px 10px;" class="card">
+        <div class="spec-row"><span class="spec-key">Diâmetro</span><span class="spec-val" id="det-moeda-diametro">—</span></div>
+        <div class="spec-row"><span class="spec-key">Espessura</span><span class="spec-val accent" id="det-moeda-espessura">—</span></div>
+        <div class="spec-row"><span class="spec-key">Peso</span><span class="spec-val" id="det-moeda-peso">—</span></div>
+        <div class="spec-row"><span class="spec-key">Formato</span><span class="spec-val" id="det-moeda-formato">—</span></div>
+        <div class="spec-row"><span class="spec-key">Borda</span><span class="spec-val" id="det-moeda-borda">—</span></div>
+        <div class="spec-row"><span class="spec-key">Rotação</span><span class="spec-val" id="det-moeda-rotacao">—</span></div>
+      </div>
+      <div style="margin:0 14px 10px;" class="card">
+        <div class="spec-row"><span class="spec-key">Cunhagem</span><span class="spec-val" id="det-moeda-cunhagem">—</span></div>
+        <div class="spec-row"><span class="spec-key">Código Krause</span><span class="spec-val accent" id="det-moeda-krause">—</span></div>
+        <div class="spec-row"><span class="spec-key">Período de emissão</span><span class="spec-val" id="det-moeda-periodo">—</span></div>
+      </div>
+      <div style="margin:0 14px 20px;" class="card card-pad">
+        <div style="font-size:13px;font-weight:700;color:var(--txt-1);margin-bottom:8px;">Notas</div>
+        <div class="nota-txt" id="det-moeda-descricao">—</div>
+      </div>
+    </div>
+  </div><!-- /det-moeda -->
+
+
+  <!-- ═══════════════════════════════════════════ -->
+  <!-- TELA: DETALHE CÉDULA                        -->
+  <!-- ═══════════════════════════════════════════ -->
+  <div class="screen" id="scr-det-cedula">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:var(--bg-page);flex-shrink:0;">
+      <button class="back-btn" onclick="goBack()"><i class="ti ti-arrow-left" style="font-size:20px;color:var(--txt-2);"></i></button>
+      <div style="display:flex;gap:14px;">
+        <button class="head-action" onclick="showToast('Link copiado!')"><i class="ti ti-share"></i></button>
+        <button class="head-action" style="color:var(--vermelho);" onclick="deletarPeca()"><i class="ti ti-trash"></i></button>
+      </div>
+    </div>
+    <div class="scroll">
+      <div class="det-photos">
+        <div class="det-photo" style="background:#2a1808;" onclick="triggerUpload('dc-frente')">
+          <input type="file" id="dc-frente" accept="image/*" style="display:none;" onchange="previewDet(this,'dc-prev-frente','dc-ph-frente')">
+          <div id="dc-ph-frente" style="font-size:38px;">💵</div>
+          <img id="dc-prev-frente" src="" style="display:none;position:absolute;inset:0;width:100%;height:100%;object-fit:cover;">
+        </div>
+        <div class="det-photo" style="background:#1a1010;" onclick="triggerUpload('dc-verso')">
+          <input type="file" id="dc-verso" accept="image/*" style="display:none;" onchange="previewDet(this,'dc-prev-verso','dc-ph-verso')">
+          <div id="dc-ph-verso" style="font-size:38px;">🏦</div>
+          <img id="dc-prev-verso" src="" style="display:none;position:absolute;inset:0;width:100%;height:100%;object-fit:cover;">
+        </div>
+      </div>
+      <div class="det-type-lbl">CÉDULA</div>
+      <div class="det-nome" id="det-cedula-nome">—</div>
+      <div class="det-pais"><span id="det-cedula-pais">—</span> <span id="det-cedula-flag" style="font-size:20px;"></span></div>
+      <div class="det-val-box">
+        <div class="det-val-lbl">Valor estimado</div>
+        <div class="det-val-num" id="det-cedula-val">—</div>
+        <button class="btn-verde" style="margin-top:10px;font-size:12px;padding:9px;" onclick="showToast('Estimativa por IA em breve!')">Gerar estimativa por IA</button>
+      </div>
+      <div style="margin:0 14px 10px;" class="card">
+        <div class="spec-row"><span class="spec-key">Material</span><span class="spec-val" id="det-cedula-material">—</span></div>
+        <div class="spec-row"><span class="spec-key">Conservação</span><span class="spec-val" id="det-cedula-conservacao">—</span></div>
+      </div>
+      <div style="padding:4px 14px 6px;font-size:13px;font-weight:700;color:var(--txt-1);">Especificações técnicas</div>
+      <div style="margin:0 14px 10px;" class="card">
+        <div class="spec-row"><span class="spec-key">Código Krause</span><span class="spec-val accent" id="det-cedula-krause">—</span></div>
+        <div class="spec-row"><span class="spec-key">Tamanho</span><span class="spec-val" id="det-cedula-tamanho">—</span></div>
+        <div class="spec-row"><span class="spec-key">Número de série</span><span class="spec-val accent2" id="det-cedula-serie">—</span></div>
+        <div class="spec-row"><span class="spec-key">Série/assinatura</span><span class="spec-val" id="det-cedula-assinatura">—</span></div>
+        <div class="spec-row"><span class="spec-key">Placa</span><span class="spec-val" id="det-cedula-placa">—</span></div>
+        <div class="spec-row"><span class="spec-key">Impressor</span><span class="spec-val" id="det-cedula-impressor">—</span></div>
+        <div class="spec-row"><span class="spec-key">Período de impressão</span><span class="spec-val accent" id="det-cedula-periodo">—</span></div>
+        <div class="spec-row"><span class="spec-key">Recursos de segurança</span><span class="spec-val" style="font-size:11px;" id="det-cedula-seguranca">—</span></div>
+      </div>
+      <div style="margin:0 14px 20px;" class="card card-pad">
+        <div style="font-size:13px;font-weight:700;color:var(--txt-1);margin-bottom:8px;">Notas</div>
+        <div class="nota-txt" id="det-cedula-descricao">—</div>
+      </div>
+    </div>
+  </div><!-- /det-cedula -->
+
+
+  <!-- ═══════════════════════════════════════════ -->
+  <!-- TELA: COLEÇÕES                              -->
+  <!-- ═══════════════════════════════════════════ -->
+  <div class="screen" id="scr-colecoes">
+    <div style="background:var(--bg-card);padding:14px 16px 12px;border-bottom:.5px solid var(--borda);flex-shrink:0;display:flex;justify-content:space-between;align-items:center;">
+      <div>
+        <div style="font-size:22px;font-weight:800;color:var(--txt-1);">Coleções</div>
+        <div style="font-size:12px;color:var(--txt-3);margin-top:1px;" id="colecoes-header-count">—</div>
+      </div>
+      <button class="btn-verde" style="width:auto;padding:9px 14px;font-size:12px;border-radius:var(--r8);" onclick="openModal('modal-nova-colecao')">+ Nova coleção</button>
+    </div>
+    <div class="scroll">
+      <div style="display:flex;flex-direction:column;gap:10px;padding:12px 14px;" id="colecoes-list">
+        <div style="padding:30px;text-align:center;color:var(--txt-4);font-size:13px;">Carregando...</div>
+      </div>
+    </div>
+    <div class="bnav">
+      <button class="bnav-item" onclick="navTo('inicio')"><i class="ti ti-layout-grid"></i><span>Início</span></button>
+      <button class="bnav-item" onclick="navTo('catalogo')"><i class="ti ti-books"></i><span>Catálogo</span></button>
+      <div class="bnav-fab"><button class="fab" onclick="openCatalogar()"><i class="ti ti-plus"></i></button></div>
+      <button class="bnav-item" onclick="navTo('eventos')"><i class="ti ti-calendar-event"></i><span>Eventos</span></button>
+      <button class="bnav-item" onclick="navTo('perfil')"><i class="ti ti-user"></i><span>Perfil</span></button>
+    </div>
+  </div><!-- /colecoes -->
+
+
+  <!-- ═══════════════════════════════════════════ -->
+  <!-- TELA: DETALHE COLEÇÃO                       -->
+  <!-- ═══════════════════════════════════════════ -->
+  <div class="screen" id="scr-det-colecao">
+    <div class="page-head" style="flex-shrink:0;">
+      <button class="back-btn" onclick="goBack()"><i class="ti ti-arrow-left" style="font-size:20px;"></i></button>
+      <h1 id="det-col-titulo-head">Coleção</h1>
+      <button class="head-action" onclick="showToast('Link copiado!')"><i class="ti ti-share"></i></button>
+    </div>
+    <div class="scroll">
+      <div style="background:var(--escuro);padding:16px 14px;margin-bottom:10px;">
+        <div style="font-size:12px;color:rgba(255,255,255,.5);margin-bottom:4px;" id="det-col-count">— itens · Valor total estimado</div>
+        <div style="font-size:28px;font-weight:800;color:#fff;" id="det-col-val">R$ 0,00</div>
+        <div style="display:flex;gap:8px;margin-top:12px;">
+          <div style="background:rgba(255,255,255,.1);border-radius:var(--r8);padding:8px 12px;text-align:center;flex:1;">
+            <div style="font-size:18px;font-weight:700;color:#fff;" id="det-col-itens-count">0</div>
+            <div style="font-size:10px;color:rgba(255,255,255,.5);">Itens</div>
+          </div>
+          <div style="background:rgba(255,255,255,.1);border-radius:var(--r8);padding:8px 12px;text-align:center;flex:1;">
+            <div style="font-size:18px;font-weight:700;color:#fff;" id="det-col-paises">0</div>
+            <div style="font-size:10px;color:rgba(255,255,255,.5);">Países</div>
+          </div>
+          <div style="background:rgba(255,255,255,.1);border-radius:var(--r8);padding:8px 12px;text-align:center;flex:1;">
+            <div style="font-size:18px;font-weight:700;color:#fff;" id="det-col-pct">0%</div>
+            <div style="font-size:10px;color:rgba(255,255,255,.5);">Avaliado</div>
+          </div>
+        </div>
+      </div>
+      <div class="section-head" style="padding-bottom:4px;"><span class="sh-title">Itens</span></div>
+      <div style="margin:6px 14px;border-radius:var(--r12);overflow:hidden;border:.5px solid var(--borda);" id="det-col-itens">
+        <div style="padding:20px;text-align:center;color:var(--txt-4);font-size:13px;">Carregando...</div>
+      </div>
+      <div style="padding:10px 14px 20px;">
+        <button class="btn-outline" onclick="showToast('Exportação em breve!')"><i class="ti ti-file-type-pdf"></i> Exportar coleção em PDF</button>
+      </div>
+    </div>
+  </div><!-- /det-colecao -->
+
+
+  <!-- ═══════════════════════════════════════════ -->
+  <!-- TELA: PARCEIROS E EVENTOS                   -->
+  <!-- ═══════════════════════════════════════════ -->
+  <div class="screen" id="scr-eventos">
+    <div style="background:var(--bg-card);padding:14px 16px 12px;border-bottom:.5px solid var(--borda);flex-shrink:0;">
+      <div style="font-size:22px;font-weight:800;color:var(--txt-1);">Parceiros e Eventos</div>
+      <div style="font-size:12px;color:var(--txt-3);margin-top:1px;">Agenda de eventos numismáticos no Brasil</div>
+    </div>
+    <div class="scroll">
+      <div style="margin:0 14px 6px;padding-top:12px;font-size:10px;font-weight:700;color:var(--txt-3);text-transform:uppercase;letter-spacing:.5px;">Agenda de eventos</div>
+      <div style="margin:0 14px;border-radius:var(--r12);overflow:hidden;border:.5px solid var(--borda);" id="eventos-list">
+        <div style="padding:20px;text-align:center;color:var(--txt-4);font-size:13px;">Carregando...</div>
+      </div>
+      <div style="height:16px;"></div>
+    </div>
+    <div class="bnav">
+      <button class="bnav-item" onclick="navTo('inicio')"><i class="ti ti-layout-grid"></i><span>Início</span></button>
+      <button class="bnav-item" onclick="navTo('catalogo')"><i class="ti ti-books"></i><span>Catálogo</span></button>
+      <div class="bnav-fab"><button class="fab" onclick="openCatalogar()"><i class="ti ti-plus"></i></button></div>
+      <button class="bnav-item active" onclick="navTo('eventos')"><i class="ti ti-calendar-event"></i><span>Eventos</span></button>
+      <button class="bnav-item" onclick="navTo('perfil')"><i class="ti ti-user"></i><span>Perfil</span></button>
+    </div>
+  </div><!-- /eventos -->
+
+
+  <!-- ═══════════════════════════════════════════ -->
+  <!-- TELA: PERFIL                                -->
+  <!-- ═══════════════════════════════════════════ -->
+  <div class="screen" id="scr-perfil">
+    <div style="background:var(--bg-card);padding:14px 16px 10px;border-bottom:.5px solid var(--borda);flex-shrink:0;display:flex;justify-content:space-between;align-items:center;">
+      <div style="font-size:22px;font-weight:800;color:var(--txt-1);">Perfil</div>
+    </div>
+    <div class="scroll">
+      <!-- Avatar -->
+      <div style="padding:20px 14px 12px;display:flex;flex-direction:column;align-items:center;background:var(--bg-card);border-bottom:.5px solid var(--borda);">
+        <div class="perf-avatar" style="cursor:pointer;" onclick="triggerUpload('avatar-input')">
+          <input type="file" id="avatar-input" accept="image/*" style="display:none;" onchange="uploadAvatar(this)">
+          <i class="ti ti-user" id="avatar-icon"></i>
+          <img id="avatar-img" src="" style="display:none;position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:50%;">
+        </div>
+        <div style="font-size:16px;font-weight:700;color:var(--txt-1);" id="perfil-nome">—</div>
+        <div style="font-size:12px;color:var(--verde);margin-top:2px;text-align:center;" id="perfil-email">—</div>
+      </div>
+      <!-- Stats -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:12px 14px;">
+        <div class="stat-mini"><div class="sm-label" style="color:var(--verde);"><i class="ti ti-coin" style="color:var(--verde);"></i> Peças</div><div class="sm-val" id="perfil-stat-pecas">0</div></div>
+        <div class="stat-mini"><div class="sm-label" style="color:var(--verde);"><i class="ti ti-currency-real" style="color:var(--verde);"></i> Valor</div><div class="sm-val" style="font-size:16px;" id="perfil-stat-valor">R$ 0,00</div></div>
+        <div class="stat-mini"><div class="sm-label" style="color:var(--verde);"><i class="ti ti-world" style="color:var(--verde);"></i> Países</div><div class="sm-val" id="perfil-stat-paises">0</div></div>
+        <div class="stat-mini"><div class="sm-label" style="color:var(--verde);"><i class="ti ti-folder" style="color:var(--verde);"></i> Coleções</div><div class="sm-val" id="perfil-stat-colecoes">0</div></div>
+      </div>
+      <!-- Editar perfil -->
+      <div style="margin:0 14px 10px;" class="card card-pad">
+        <div style="font-size:14px;font-weight:700;color:var(--txt-1);margin-bottom:12px;">Editar perfil</div>
+        <div class="fgroup" style="margin-bottom:10px;"><label class="flabel">Nome</label><input class="fi" id="perfil-input-nome"></div>
+        <div class="fgroup" style="margin-bottom:12px;">
+          <label class="flabel">Bio</label>
+          <textarea class="fta" id="perfil-input-bio" placeholder="Conte sobre sua paixão pela numismática..." maxlength="200" oninput="contarBio()"></textarea>
+          <div style="text-align:right;font-size:10px;color:var(--txt-4);margin-top:3px;" id="bio-count">0/200</div>
+        </div>
+        <button class="btn-primary" onclick="salvarPerfil()">Salvar alterações</button>
+      </div>
+      <!-- Exportar -->
+      <div style="margin:0 14px 10px;" class="card card-pad">
+        <div style="font-size:14px;font-weight:700;color:var(--txt-1);margin-bottom:4px;">Exportar acervo</div>
+        <div style="font-size:11px;color:var(--txt-3);margin-bottom:12px;line-height:1.5;">Funcionalidade de exportação em desenvolvimento.</div>
+        <div class="exp-grid">
+          <button class="exp-btn-sm" onclick="showToast('Em breve!')"><i class="ti ti-table"></i> CSV</button>
+          <button class="exp-btn-sm" onclick="showToast('Em breve!')"><i class="ti ti-file-type-pdf"></i> PDF</button>
+        </div>
+        <button class="btn-dourado" style="margin-bottom:8px;display:flex;align-items:center;justify-content:center;gap:6px;" onclick="showToast('Em breve!')"><i class="ti ti-book" style="font-size:16px;"></i> Catálogo estilo livro</button>
+        <button class="btn-outline" onclick="showToast('Em breve!')"><i class="ti ti-database-export"></i> Backup completo (JSON)</button>
+      </div>
+      <!-- Sobre -->
+      <div style="margin:0 14px 10px;border-radius:var(--r12);overflow:hidden;border:.5px solid var(--borda);">
+        <div style="padding:10px 14px;background:var(--bg-card);border-bottom:.5px solid var(--borda);"><span style="font-size:12px;font-weight:700;color:var(--txt-3);">Sobre o aplicativo</span></div>
+        <div class="menu-row"><i class="ti ti-info-circle"></i><span class="mr-label">Versão</span><span class="mr-val">1.0.0</span></div>
+        <div class="menu-row"><i class="ti ti-shield" style="color:var(--verde);"></i><span class="mr-label green">Segurança via Supabase RLS</span></div>
+      </div>
+      <div style="padding:0 14px 6px;">
+        <button class="btn-outline" onclick="logout()" style="margin-bottom:8px;"><i class="ti ti-logout"></i> Sair da conta</button>
+        <button class="btn-danger" onclick="confirmarExclusaoConta()"><i class="ti ti-trash"></i> Excluir conta</button>
+      </div>
+      <div style="height:16px;"></div>
+    </div>
+    <div class="bnav">
+      <button class="bnav-item" onclick="navTo('inicio')"><i class="ti ti-layout-grid"></i><span>Início</span></button>
+      <button class="bnav-item" onclick="navTo('catalogo')"><i class="ti ti-books"></i><span>Catálogo</span></button>
+      <div class="bnav-fab"><button class="fab" onclick="openCatalogar()"><i class="ti ti-plus"></i></button></div>
+      <button class="bnav-item" onclick="navTo('eventos')"><i class="ti ti-calendar-event"></i><span>Eventos</span></button>
+      <button class="bnav-item active" onclick="navTo('perfil')"><i class="ti ti-user"></i><span>Perfil</span></button>
+    </div>
+  </div><!-- /perfil -->
+
+
+  <!-- ═══════════════════════════════════════════ -->
+  <!-- MODAL: NOVA COLEÇÃO                         -->
+  <!-- ═══════════════════════════════════════════ -->
+  <div class="modal-overlay" id="modal-nova-colecao" onclick="closeModalOutside(event,'modal-nova-colecao')">
+    <div class="modal-sheet">
+      <div class="modal-handle"></div>
+      <div class="modal-title">Nova coleção</div>
+      <div class="modal-form">
+        <div class="fgroup" style="margin-bottom:10px;">
+          <label class="flabel">Nome da coleção <span class="req">*</span></label>
+          <input class="fi" id="nova-colecao-nome" placeholder="Ex: Moedas do Império Brasileiro">
+        </div>
+        <div class="fgroup" style="margin-bottom:14px;">
+          <label class="flabel">Descrição</label>
+          <textarea class="fta" id="nova-colecao-desc" placeholder="Descreva sua coleção..."></textarea>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:4px;">
+          <button class="btn-outline" onclick="closeModal('modal-nova-colecao')">Cancelar</button>
+          <button class="btn-verde" onclick="criarColecao()">Criar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOAST -->
+  <div class="toast" id="toast"></div>
+
+</div><!-- /device -->
+
+<script src="js/config.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

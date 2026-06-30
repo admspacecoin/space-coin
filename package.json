@@ -1,0 +1,16 @@
+{
+  "name": "space-coin",
+  "version": "1.0.0",
+  "description": "Catálogo inteligente de moedas e cédulas para colecionadores",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
